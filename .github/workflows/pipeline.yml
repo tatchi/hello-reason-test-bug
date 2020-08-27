@@ -53,29 +53,6 @@ jobs:
       - name: Build project
         run: esy build
 
-      - name: Run Native tests
-        run: esy test_native
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ matrix.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ matrix.os }}-yarn-
-
-      - name: Install Yarn dependencies
-        run: yarn install --frozen-lockfile
-        working-directory: ./test/bucklescript
-
-      - name: test-bucklescript
-        run: |
-          yarn build
-          yarn test
-        working-directory: ./test/bucklescript
-
       # Create the NPM package for this platform
       - name: Create npm package
         run: esy npm-release
@@ -141,38 +118,6 @@ jobs:
         with:
           name: release-tarball
           path: tailwind-ppx.tgz
-
-  test-platform:
-    name: Test installing ${{ matrix.os }}
-    needs: prepare-publish
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-    steps:
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - name: Download ${{ matrix.os }} release
-        uses: actions/download-artifact@v2
-        with:
-          name: release-tarball
-      - name: test install
-        run: npm -g install ./tailwind-ppx.tgz bs-platform
-      - name: bootstrap test project
-        run: bsb -init test-tailwind-ppx -theme basic-reason
-      - name: install bs-platform locally
-        run: npm install bs-platform
-        working-directory: ./test-tailwind-ppx
-      - name: build project
-        run: npm run build
-        working-directory: ./test-tailwind-ppx
-      - name: test tailwind-ppx binary
-        run: tailwind-ppx --help
-      - name: test use-tailwind-ppx binary
-        run: use-tailwind-ppx
-        working-directory: ./test-tailwind-ppx
 
   publish:
     needs: prepare-publish
