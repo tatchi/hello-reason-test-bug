@@ -36,11 +36,10 @@ const rewritePrefix =
 
 const packageJson = JSON.stringify(
   {
-    name: '@dylanirlbeck/tailwind-ppx',
+    name: mainPackageJson.name,
     version: mainPackageJson.version,
     license: mainPackageJson.license,
     description: mainPackageJson.description,
-    repository: mainPackageJson.repository,
     repository: mainPackageJson.repository,
     scripts: {
       postinstall: rewritePrefix
