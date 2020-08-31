@@ -43,7 +43,7 @@ const packageJson = JSON.stringify(
     repository: mainPackageJson.repository,
     scripts: {
       postinstall: rewritePrefix
-        ? 'ESY_RELEASE_REWRITE_PREFIX=true node ./postinstall.js'
+        ? "node -e \"process.env['ESY_RELEASE_REWRITE_PREFIX']=true; require('./postinstall.js')\""
         : 'node ./postinstall.js',
     },
     bin: bins,
