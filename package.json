@@ -10,8 +10,7 @@
     "release": {
       "bin": [
         "Hello"
-      ],
-      "rewritePrefix": true
+      ]
     },
     "buildEnv": {
       "ODOC_SYNTAX": "re"
