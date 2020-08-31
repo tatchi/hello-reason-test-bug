@@ -1,4 +1,4 @@
-name: tailwind-ppx pipeline
+name: hello-reason pipeline
 
 on:
   push:
@@ -108,7 +108,7 @@ jobs:
         run: npm pack .
         working-directory: _release
       - name: move package
-        run: mv _release/*.tgz tailwind-ppx.tgz
+        run: mv _release/*.tgz hello-reason.tgz
       # Upload artifacts
       - uses: actions/upload-artifact@v2
         with:
@@ -117,55 +117,33 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: release-tarball
-          path: tailwind-ppx.tgz
+          path: hello-reason.tgz
 
-  publish:
+  test-platform:
+    name: Test installing ${{ matrix.os }}
     needs: prepare-publish
-    if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/')
-    name: (only on release) Publish
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
-          node-version: 12.x
-
-      - name: Download release
+          node-version: 12
+      - name: Download ${{ matrix.os }} release
         uses: actions/download-artifact@v2
         with:
-          name: release
-          path: release
-      - name: Zip release folder
-        run: zip -r release.zip release
-      - name: Create GitHub release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload ubuntu-latest to Github release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release.zip
-          asset_name: release.zip
-          asset_content_type: application/gzip
-
-      - name: Publish NPM package
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@dylanirlbeck"
-          npm config list
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
-        working-directory: ./release
+          name: release-tarball
+      - name: test install
+        run: npm -g install ./hello-reason.tgz bs-platform
+      - name: bootstrap test project
+        run: bsb -init test-hello-reason -theme basic-reason
+      - name: install bs-platform locally
+        run: npm install bs-platform
+        working-directory: ./test-hello-reason
+      - name: build project
+        run: npm run build
+        working-directory: ./test-hello-reason
+      - name: test hello-reason binary
+        run: npx Hello

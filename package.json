@@ -1,6 +1,6 @@
 {
   "name": "hello-reason",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "Example Reason Esy Project",
   "license": "MIT",
   "esy": {
@@ -10,7 +10,8 @@
     "release": {
       "bin": [
         "Hello"
-      ]
+      ],
+      "rewritePrefix": true
     },
     "buildEnv": {
       "ODOC_SYNTAX": "re"
