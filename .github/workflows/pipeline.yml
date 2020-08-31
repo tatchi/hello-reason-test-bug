@@ -135,15 +135,19 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: release-tarball
-      - name: test install
-        run: npm -g install ./hello-reason.tgz bs-platform
+      - name: install bs-platform globally
+        run: npm -g install bs-platform
       - name: bootstrap test project
         run: bsb -init test-hello-reason -theme basic-reason
       - name: install bs-platform locally
         run: npm install bs-platform
+        working-directory: ./test-hello-reason
+      - name: install hello-reason locally
+        run: npm install ../hello-reason.tgz
         working-directory: ./test-hello-reason
       - name: build project
         run: npm run build
         working-directory: ./test-hello-reason
       - name: test hello-reason binary
         run: npx Hello
+        working-directory: ./test-hello-reason
