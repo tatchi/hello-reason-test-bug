@@ -78,17 +78,17 @@ jobs:
 
       # Download platform artifacts
       - name: Download Linux release
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ubuntu-latest
           path: ubuntu-latest
       - name: Download Windows release
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: windows-latest
           path: windows-latest
       - name: Download macOS release
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: macos-latest
           path: macos-latest
@@ -132,7 +132,7 @@ jobs:
         with:
           node-version: 12
       - name: Download ${{ matrix.os }} release
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: release-tarball
       - name: install bs-platform globally
